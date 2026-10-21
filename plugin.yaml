@@ -1,0 +1,12 @@
+name: hermes-bot-push
+version: 1.0.0
+description: "Push a banner to the Herald app when a bot finishes a turn or needs an approval, even while the phone's socket is asleep. Observation only — never alters a turn."
+author: Herald
+kind: standalone
+platforms:
+  - linux
+  - macos
+  - windows
+hooks:
+  - post_llm_call
+  - pre_approval_request

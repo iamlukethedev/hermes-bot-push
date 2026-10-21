@@ -1,0 +1,18 @@
+# Python.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Secrets never belong in this repo: the plugin needs none.
+.env
+.env.*
+*.p8
+*.pem
+*.key
+
+# Editors and OS files.
+.DS_Store
+.idea/
+.vscode/
