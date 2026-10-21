@@ -123,6 +123,17 @@ def parse_targets(meta: Any) -> Dict[str, Any]:
     return {"tokens": tokens, "labels": labels}
 
 
+def _safe_load_yaml(text: str) -> Any:
+    """Parse YAML with the parser this Hermes ships: PyYAML up to 0.21, ruamel.yaml from 0.22."""
+    try:
+        import yaml
+    except ImportError:
+        from ruamel.yaml import YAML
+
+        return YAML(typ="safe", pure=True).load(text)
+    return yaml.safe_load(text)
+
+
 def _load_targets() -> Dict[str, Any]:
     """Read the registered phones, re-parsing only when the file changed."""
     path = _default_profile_yaml()
@@ -133,14 +144,17 @@ def _load_targets() -> Dict[str, Any]:
     if _targets_cache["mtime"] == mtime and _targets_cache["value"] is not None:
         return _targets_cache["value"]
     try:
-        import yaml
-
         with open(path, "r", encoding="utf-8") as handle:
-            data = yaml.safe_load(handle) or {}
+            data = _safe_load_yaml(handle.read()) or {}
         ui_meta = data.get("ui_meta") if isinstance(data, dict) else None
         value = parse_targets(ui_meta.get(META_KEY) if isinstance(ui_meta, dict) else None)
     except Exception as exc:
-        _log.debug("hermes-bot-push: could not read %s: %s", path, exc)
+        # The failure is cached like a good read, so this warns once per change to the file.
+        _log.warning(
+            "hermes-bot-push: could not read the registered phones from %s, so no push is sent: %s",
+            path,
+            exc,
+        )
         value = {"tokens": [], "labels": {}}
     _targets_cache["mtime"] = mtime
     _targets_cache["value"] = value

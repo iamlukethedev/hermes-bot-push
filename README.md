@@ -102,7 +102,7 @@ The plugin registers two Hermes hooks, `post_llm_call` (a turn finished) and `pr
 being asked to approve a tool call; the automatic "smart" approval pass is skipped). For each event it checks the
 session belongs to Herald, reads the registered push tokens from the default profile and posts one message per
 phone to Expo on a background thread with a five-second timeout. Everything is plain Python standard library plus
-the `yaml` package Hermes already ships.
+the YAML parser Hermes already ships: PyYAML on Hermes 0.21 and earlier, ruamel.yaml from 0.22.
 
 ## License
 
